@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" class="overscroll-none" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DEVASHREE NAIK // Software Engineer & Tech Explorer</title>
+  <meta name="description"
+    content="Portfolio of Devashree Naik — Software Engineer, AI Explorer, and Author of 'Code & Capital'. Minimalist Swiss-brutalist digital experience featuring real-time search, dual-mode list/slider navigation, and interactive labs." />
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="DEVASHREE NAIK // Portfolio" />
+  <meta property="og:description"
+    content="Minimalist, detail-driven developer portfolio inspired by Cathy Dollé. Featuring real-time search, interactive command palette, and kinetic slider." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/devashree.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts: Space Mono (Precision Monospace) & Syne / Inter (Editorial Brutalism) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Custom Pixel Crosshair Cursor (Cathy Dollé Signature) -->
+  <div id="pixelCrosshair" class="crosshair-wrapper" aria-hidden="true">
+    <div class="crosshair-box"></div>
+    <div class="crosshair-dot"></div>
+    <div id="pixelText" class="crosshair-label">
+      <span id="crosshairAction">NAVIGATE</span>
+    </div>
+  </div>
+
+  <!-- Background Canvas for Generative Ambience / WebGL Sim -->
+  <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
+
+  <!-- Sticky Top Header -->
+  <header id="siteHeader" class="site-header">
+    <div class="header-inner">
+      <!-- Left: Identity -->
+      <a href="#top" id="brandLogo" class="brand-link" aria-label="Devashree Naik Homepage">
+        <span class="brand-mark">■</span>
+        <h1 class="brand-name">DEVASHREE NAIK</h1>
+        <span class="brand-tag">SOFTWARE & AI // 2026</span>
+      </a>
+
+      <!-- Center: Layout View Toggles (List vs Slider vs Labs) -->
+      <nav class="view-nav" aria-label="Layout view modes">
+        <button id="toggleList" class="nav-toggle-btn active" data-view="list" aria-label="Switch to list view">
+          <span class="toggle-icon">☰</span> [ LIST ]
+        </button>
+        <button id="toggleSlider" class="nav-toggle-btn" data-view="slider"
+          aria-label="Switch to horizontal slider view">
+          <span class="toggle-icon">↔</span> [ SLIDER ]
+        </button>
+        <button id="toggleLabs" class="nav-toggle-btn" data-view="labs" aria-label="Open generative canvas playground">
+          <span class="toggle-icon">✦</span> [ LABS ]
+        </button>
+      </nav>
+
+      <!-- Right: Utility Controls -->
+      <div class="header-actions">
+        <!-- Command Palette Trigger -->
+        <button id="searchTriggerBtn" class="action-btn search-pill"
+          aria-label="Open command palette and project search" title="Press ⌘K or / to search">
+          <span class="key-icon">⌘</span>
+          <span class="search-label">SEARCH</span>
+          <span class="key-hint">/</span>
+        </button>
+
+        <a href="https://devashreenaik.substack.com/?utm_campaign=profile_chips" target="_blank"
+          rel="noopener noreferrer" class="action-btn text-btn substack-nav-link"
+          aria-label="Read Code & Capital on Substack">
+          SUBSTACK ↗
+        </a>
+
+        <button id="aboutTriggerBtn" class="action-btn text-btn" aria-label="Open developer dossier and biography">
+          ABOUT
+        </button>
+
+        <!-- Audio Feedback Toggle -->
+        <button id="audioToggleBtn" class="action-btn icon-btn" aria-label="Toggle tactile sound feedback"
+          title="Toggle audio clicks">
+          <span id="audioStatusText">SFX: ON</span>
+        </button>
+
+        <!-- Invert / Contrast Toggle -->
+        <button id="themeToggleBtn" class="action-btn icon-btn" aria-label="Invert monochrome theme"
+          title="Toggle light/dark contrast">
+          ◐
+        </button>
+      </div>
+    </div>
+
+    <!-- Secondary Meta Strip / Category Filter Bar -->
+    <div class="filter-strip">
+      <div class="filter-meta-left">
+        <span class="status-indicator">
+          <span class="pulse-dot"></span> AVAILABLE FOR Q4 2026
+        </span>
+        <span class="divider">/</span>
+        <span id="liveClock" class="live-clock">PARIS 00:00:00 UTC+2</span>
+      </div>
+
+      <!-- Quick Filter Pills -->
+      <div class="filter-pills" role="tablist" aria-label="Filter projects by discipline">
+        <button class="filter-pill active" data-filter="all" role="tab" aria-selected="true">
+          ALL <span class="pill-count" id="countAll">10</span>
+        </button>
+        <button class="filter-pill" data-filter="systems" role="tab" aria-selected="false">
+          SYSTEMS <span class="pill-count" id="countSystems">4</span>
+        </button>
+        <button class="filter-pill" data-filter="ai" role="tab" aria-selected="false">
+          AI / AGENTS <span class="pill-count" id="countAi">1</span>
+        </button>
+        <button class="filter-pill" data-filter="creative" role="tab" aria-selected="false">
+          CREATIVE TECH <span class="pill-count" id="countCreative">2</span>
+        </button>
+        <button class="filter-pill" data-filter="frontend" role="tab" aria-selected="false">
+          FRONTEND <span class="pill-count" id="countFrontend">1</span>
+        </button>
+        <button class="filter-pill" data-filter="fullstack" role="tab" aria-selected="false">
+          FULL-STACK <span class="pill-count" id="countFullstack">2</span>
+        </button>
+      </div>
+
+      <div class="filter-meta-right">
+        <span id="resultsCount">10 / 10 ARTIFACTS</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewports Container -->
+  <main id="mainViewport" class="main-viewport">
+
+    <!-- VIEW 1: Architectural Numbered List View (Cathy Dollé Native Style) -->
+    <section id="listViewSection" class="view-panel list-panel active" aria-label="Project list view">
+      <div class="list-layout">
+        <!-- Floating Hover Preview Card (Fixed in viewport, tracks hovered project) -->
+        <div id="hoverPreviewBox" class="hover-preview-box" aria-hidden="true">
+          <div class="preview-inner">
+            <div class="preview-header">
+              <span id="previewNum" class="preview-num">01/</span>
+              <span id="previewCategory" class="preview-category">SYSTEMS</span>
+              <span id="previewYear" class="preview-year">2026</span>
+            </div>
+            <div id="previewArt" class="preview-art">
+              <!-- Dynamically populated SVG pattern -->
+            </div>
+            <div class="preview-body">
+              <h3 id="previewTitle" class="preview-title">REA Engine</h3>
+              <p id="previewSubtitle" class="preview-subtitle">Automated Reverse Engineering & Binary Analysis Agent</p>
+              <div id="previewStack" class="preview-stack-tags"></div>
+            </div>
+            <div class="preview-footer">
+              <span class="preview-hint">CLICK TO EXPAND DOSSIER [↵]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Numbered Project Grid -->
+        <div class="project-columns" id="projectListContainer" role="list">
+          <!-- Dynamically generated list items (Left Column text-start, Right Column text-end) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Horizontal Kinetic Card Slider -->
+    <section id="sliderViewSection" class="view-panel slider-panel" aria-label="Horizontal project slider view" hidden>
+      <div class="slider-controls-bar">
+        <span class="slider-hint">SCROLL WHEEL OR DRAG TO SLIDE HORIZONTALLY</span>
+        <div class="slider-nav-arrows">
+          <button id="sliderPrevBtn" class="arrow-btn" aria-label="Slide previous project">← PREV</button>
+          <span class="slider-counter" id="sliderCounter">01 / 10</span>
+          <button id="sliderNextBtn" class="arrow-btn" aria-label="Slide next project">NEXT →</button>
+        </div>
+      </div>
+      <div id="sliderTrack" class="slider-track" tabindex="0" role="region" aria-label="Draggable project carousel">
+        <!-- Dynamically generated horizontal cards -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: Interactive Generative Labs (Inspired by Cathy's /playground) -->
+    <section id="labsViewSection" class="view-panel labs-panel" aria-label="Generative playground view" hidden>
+      <div class="labs-header">
+        <div class="labs-info">
+          <h2 class="labs-title">LABS // KINETIC VECTOR ATTRACTION FIELD</h2>
+          <p class="labs-desc">Real-time particle simulation responding to pointer dynamics and wave harmonics. Move
+            your mouse or click to pulse the vector grid.</p>
+        </div>
+        <div class="labs-controls">
+          <label class="control-label">
+            MODE:
+            <select id="labSimMode" class="select-input">
+              <option value="particles">PARTICLE SWARM</option>
+              <option value="matrix">DIGITAL MATRIX</option>
+              <option value="wave">TOPOLOGICAL WAVE</option>
+            </select>
+          </label>
+          <button id="labBurstBtn" class="action-btn text-btn">PULSE FIELD [SPACE]</button>
+          <button id="labClearBtn" class="action-btn text-btn">RESET</button>
+        </div>
+      </div>
+      <div class="labs-canvas-container">
+        <canvas id="labsCanvas" class="labs-canvas"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sticky Minimalist Footer -->
+  <footer id="siteFooter" class="site-footer">
+    <div class="footer-left">
+      <span class="footer-copy">© 2026 DEVASHREE NAIK</span>
+      <span class="footer-commit">AUTHOR: "CODE & CAPITAL"</span>
+      <span class="footer-stack">HTML5 // VANILLA CSS // WEB STANDARDS</span>
+    </div>
+
+    <div class="footer-links">
+      <a href="https://devashreenaik.substack.com/" target="_blank" rel="noopener noreferrer"
+        class="footer-link">SUBSTACK ↗</a>
+      <a href="https://github.com/DevashreeNaik24" target="_blank" rel="noopener noreferrer" class="footer-link">GITHUB
+        ↗</a>
+      <a href="https://www.linkedin.com/in/devashree-naik-91880428a/" target="_blank" rel="noopener noreferrer"
+        class="footer-link">LINKEDIN ↗</a>
+      <a href="mailto:devashreenaik2431@gmail.com" class="footer-link contact-pill">CONTACT [EMAIL]</a>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: Power Search & Command Palette (Triggered by ⌘K / "/" or button) -->
+  <!-- ========================================================================= -->
+  <dialog id="searchModal" class="palette-dialog" aria-labelledby="searchHeading" closedby="any">
+    <div class="palette-window">
+      <div class="palette-search-bar">
+        <span class="palette-icon">⌕</span>
+        <input type="text" id="paletteInput" class="palette-input"
+          placeholder="Type to search projects, tech stack (e.g. Rust, WebGL), commands..." autocomplete="off"
+          spellcheck="false" aria-autocomplete="list" aria-controls="paletteResultsList" />
+        <button id="paletteClearBtn" class="palette-clear-btn" aria-label="Clear search input" hidden>✕</button>
+        <kbd class="palette-esc-badge" id="closePaletteBtn">ESC</kbd>
+      </div>
+
+      <!-- Quick Filter Tags Inside Search -->
+      <div class="palette-quick-filters">
+        <span class="quick-filter-label">QUICK TAGS:</span>
+        <button class="quick-tag" data-tag="all">All</button>
+        <button class="quick-tag" data-tag="Rust">Rust</button>
+        <button class="quick-tag" data-tag="TypeScript">TypeScript</button>
+        <button class="quick-tag" data-tag="WebGL">WebGL</button>
+        <button class="quick-tag" data-tag="WebGPU">WebGPU</button>
+        <button class="quick-tag" data-tag="MCP">MCP</button>
+        <button class="quick-tag" data-tag="eBPF">eBPF</button>
+      </div>
+
+      <!-- Results Container -->
+      <div class="palette-body">
+        <div id="paletteResultsList" class="palette-results" role="listbox" aria-label="Search results">
+          <!-- Dynamically inserted search results -->
+        </div>
+
+        <!-- Quick Keyboard Command Shortcuts -->
+        <div class="palette-quick-commands">
+          <div class="cmd-section-title">SYSTEM SHORTCUTS & LINKS</div>
+          <div class="cmd-item" data-action="open-substack">
+            <span class="cmd-key">[W]</span>
+            <span class="cmd-text">Read Substack: "Code & Capital" ↗</span>
+          </div>
+          <div class="cmd-item" data-action="open-github">
+            <span class="cmd-key">[G]</span>
+            <span class="cmd-text">Visit GitHub: @DevashreeNaik24 ↗</span>
+          </div>
+          <div class="cmd-item" data-action="open-linkedin">
+            <span class="cmd-key">[I]</span>
+            <span class="cmd-text">Connect on LinkedIn ↗</span>
+          </div>
+          <div class="cmd-item" data-action="view-list">
+            <span class="cmd-key">[L]</span>
+            <span class="cmd-text">Switch to Numbered List View</span>
+          </div>
+          <div class="cmd-item" data-action="view-slider">
+            <span class="cmd-key">[S]</span>
+            <span class="cmd-text">Switch to Horizontal Kinetic Slider</span>
+          </div>
+          <div class="cmd-item" data-action="view-labs">
+            <span class="cmd-key">[P]</span>
+            <span class="cmd-text">Open Interactive Canvas Labs</span>
+          </div>
+          <div class="cmd-item" data-action="open-about">
+            <span class="cmd-key">[A]</span>
+            <span class="cmd-text">Open Developer Dossier & Bio</span>
+          </div>
+          <div class="cmd-item" data-action="toggle-theme">
+            <span class="cmd-key">[T]</span>
+            <span class="cmd-text">Toggle Contrast Inversion (Dark/Light)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Palette Footer -->
+      <div class="palette-footer">
+        <div class="key-legends">
+          <span><kbd>↑</kbd> <kbd>↓</kbd> Navigate</span>
+          <span><kbd>↵</kbd> Select</span>
+          <span><kbd>ESC</kbd> Close</span>
+        </div>
+        <div id="paletteMatchesStatus" class="palette-status">10 items available</div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: Project Detail Inspection Drawer                                 -->
+  <!-- ========================================================================= -->
+  <dialog id="projectModal" class="project-drawer" aria-labelledby="modalProjectTitle" closedby="any">
+    <div class="drawer-container">
+      <div class="drawer-header">
+        <div class="drawer-id-group">
+          <span id="modalProjectNum" class="drawer-num">01/</span>
+          <span id="modalProjectCategory" class="drawer-badge">SYSTEMS</span>
+          <span id="modalProjectYear" class="drawer-year">2026</span>
+        </div>
+        <button id="closeProjectModalBtn" class="drawer-close-btn" aria-label="Close project dossier">
+          [ CLOSE ✕ ]
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-title-section">
+          <h2 id="modalProjectTitle" class="drawer-title">REA Engine</h2>
+          <p id="modalProjectSubtitle" class="drawer-subtitle">Automated Reverse Engineering & Binary Analysis Agent</p>
+          <div class="drawer-meta-row">
+            <span class="meta-item"><strong>ROLE:</strong> <span id="modalProjectRole">Lead Systems
+                Architect</span></span>
+            <span class="meta-item"><strong>PROVENANCE:</strong> <span id="modalProjectProvenance">OPEN SOURCE //
+                CANONICAL</span></span>
+          </div>
+        </div>
+
+        <!-- Visual Schematic Area -->
+        <div class="drawer-artwork-frame">
+          <div id="modalProjectArt" class="drawer-art-canvas"></div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="drawer-metrics-grid" id="modalMetricsGrid">
+          <!-- Dynamically inserted metric stats -->
+        </div>
+
+        <!-- Description & Architecture Highlights -->
+        <div class="drawer-content-section">
+          <h3 class="section-label">EXECUTIVE SUMMARY</h3>
+          <p id="modalProjectDesc" class="drawer-summary-text"></p>
+
+          <h3 class="section-label">KEY TECHNICAL ACHIEVEMENTS</h3>
+          <ul id="modalHighlightsList" class="drawer-highlights-list"></ul>
+
+          <h3 class="section-label">TECH STACK & DEPENDENCY PROFILE</h3>
+          <div id="modalStackChips" class="drawer-stack-chips"></div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <div class="drawer-actions">
+          <a id="modalGithubLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary">
+            VIEW REPOSITORY [GIT] ↗
+          </a>
+          <a id="modalDemoLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+            LAUNCH LIVE SYSTEM ↗
+          </a>
+        </div>
+        <span class="drawer-disclaimer">EVIDENCE-BACKED RECONSTRUCTION // FAIL-CLOSED</span>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: Developer Dossier & Biography Modal                              -->
+  <!-- ========================================================================= -->
+  <dialog id="aboutModal" class="about-drawer" aria-labelledby="aboutHeading" closedby="any">
+    <div class="about-container">
+      <div class="about-header">
+        <h2 id="aboutHeading" class="about-title">DOSSIER // DEVASHREE NAIK</h2>
+        <button id="closeAboutBtn" class="drawer-close-btn" aria-label="Close about dossier">
+          [ CLOSE ✕ ]
+        </button>
+      </div>
+
+      <div class="about-body">
+        <div class="about-profile-hero">
+          <div class="about-hero-layout">
+            <div class="portrait-frame">
+              <img src="assets/devashree.jpg" alt="Devashree Naik" class="portrait-img" />
+              <div class="portrait-badge">DEVASHREE NAIK // 2026</div>
+            </div>
+            <div class="bio-tagline">
+              <span class="tag-status">● VERIFIED DEVELOPER PROFILE</span>
+              <h3 class="bio-name">DEVASHREE NAIK</h3>
+              <p class="bio-subtitle">Software Engineer & Tech Author // "Code & Capital"</p>
+              <p class="bio-lead">Hey, I'm a woman in tech. I explore software systems, AI agents, modern web
+                architectures, and everything I'm curious about, while learning how to build financial independence
+                along the way. Author of <em>Code & Capital</em> on Substack — learning, questioning, and figuring it
+                out in public.</p>
+
+              <div class="substack-callout-card">
+                <div class="substack-card-left">
+                  <span class="substack-badge">SUBSTACK PUBLICATION</span>
+                  <h4 class="substack-card-title">Code & Capital</h4>
+                  <p class="substack-card-desc">Deep dives into software engineering, AI agents, wealth building, and
+                    tech career insights.</p>
+                </div>
+                <a href="https://devashreenaik.substack.com/?utm_campaign=profile_chips" target="_blank"
+                  rel="noopener noreferrer" class="btn-primary substack-read-btn">
+                  READ SUBSTACK ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Matrix -->
+        <div class="skills-section">
+          <h3 class="about-section-title">CORE TECHNICAL COMPETENCIES</h3>
+          <div id="skillsMatrixContainer" class="skills-grid">
+            <!-- Dynamically populated from developerBio -->
+          </div>
+        </div>
+
+        <!-- Career Milestones -->
+        <div class="timeline-section">
+          <h3 class="about-section-title">CAREER TRAJECTORY & IMPACT</h3>
+          <div id="timelineContainer" class="timeline-list">
+            <!-- Dynamically populated from developerBio -->
+          </div>
+        </div>
+
+        <!-- Philosophy Section inspired by Ponytail & Cathy Dollé -->
+        <div class="philosophy-section">
+          <h3 class="about-section-title">ENGINEERING PHILOSOPHY</h3>
+          <div class="philosophy-card">
+            <p><strong>01 / Build and Figure it Out in Public:</strong> The best engineers share their questions,
+              failures, and breakthroughs openly. Continuous experimentation compounds faster than hidden perfection.
+            </p>
+            <p><strong>02 / Radical Simplicity & Standard First:</strong> Rely on clean primitives, standard libraries,
+              and resilient architectures before reaching for heavy dependencies.</p>
+            <p><strong>03 / Code as Leverage:</strong> Software engineering isn't just about syntax—it is about creating
+              autonomy, leverage, and scalable value.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-footer">
+        <a href="https://devashreenaik.substack.com/?utm_campaign=profile_chips" target="_blank"
+          rel="noopener noreferrer" class="btn-primary">READ SUBSTACK ↗</a>
+        <a href="https://github.com/DevashreeNaik24" target="_blank" rel="noopener noreferrer"
+          class="btn-secondary">GITHUB PROFILE ↗</a>
+        <a href="https://www.linkedin.com/in/devashree-naik-91880428a/" target="_blank" rel="noopener noreferrer"
+          class="btn-secondary">LINKEDIN PROFILE ↗</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Application Logic -->
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>

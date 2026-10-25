@@ -1,0 +1,12 @@
+{
+  "name": "developers-portfolio",
+  "version": "1.0.0",
+  "description": "Minimalist Swiss-brutalist developer portfolio inspired by Cathy Dollé, featuring real-time search, command palette, and kinetic slider.",
+  "scripts": {
+    "start": "npx -y serve . -p 3000",
+    "dev": "npx -y serve . -p 3000"
+  },
+  "keywords": ["portfolio", "brutalism", "cathy-dolle", "search", "creative-developer", "webgl"],
+  "author": "Alexander Vance",
+  "license": "MIT"
+}
